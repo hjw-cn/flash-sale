@@ -24,7 +24,7 @@ public class StocksAlignScheduler {
     @Resource
     private FlashItemDomainService flashItemDomainService;
 
-    @Scheduled(cron = "*/2 * * * * ?")
+//    @Scheduled(cron = "*/2 * * * * ?")
     @BetaTrace
     public void alignStocksTask() {
         logger.info("alignStocksTask|校准库存缓存开始");

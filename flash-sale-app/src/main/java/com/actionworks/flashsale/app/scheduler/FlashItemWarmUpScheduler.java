@@ -23,7 +23,7 @@ public class FlashItemWarmUpScheduler {
     @Resource
     private FlashItemDomainService flashItemDomainService;
 
-    @Scheduled(cron = "*/5 * * * * ?")
+//    @Scheduled(cron = "*/5 * * * * ?")
     @BetaTrace
     public void warmUpFlashItemTask() {
         logger.info("warmUpFlashItemTask|秒杀品预热调度");

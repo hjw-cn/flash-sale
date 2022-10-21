@@ -40,6 +40,7 @@ public class FlashActivity implements Serializable {
         return JSON.toJSONString(this);
     }
 
+
     public boolean validateParamsForCreateOrUpdate() {
         if (StringUtils.isEmpty(activityName)
                 || startTime == null
@@ -49,6 +50,10 @@ public class FlashActivity implements Serializable {
         return true;
     }
 
+    /**
+     * 判断秒杀活动是否已经开始
+     * @return
+     */
     public boolean isOnline() {
         return FlashActivityStatus.isOnline(status);
     }

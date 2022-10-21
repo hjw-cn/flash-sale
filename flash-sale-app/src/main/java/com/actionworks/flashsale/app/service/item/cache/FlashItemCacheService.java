@@ -25,6 +25,9 @@ import static com.actionworks.flashsale.util.StringUtil.link;
 @Service
 public class FlashItemCacheService {
     private final static Logger logger = LoggerFactory.getLogger(FlashItemCacheService.class);
+    /**
+     * 秒杀品的本地缓存
+     */
     private final static Cache<Long, FlashItemCache> flashItemLocalCache = CacheBuilder.newBuilder().initialCapacity(10).concurrencyLevel(5).expireAfterWrite(10, TimeUnit.SECONDS).build();
     private static final String UPDATE_ITEM_CACHE_LOCK_KEY = "UPDATE_ITEM_CACHE_LOCK_KEY_";
     private final Lock localCacleUpdatelock = new ReentrantLock();
@@ -38,20 +41,28 @@ public class FlashItemCacheService {
     @Resource
     private DistributedLockFactoryService distributedLockFactoryService;
 
+    /**
+     * 获取秒杀品的缓存
+     * @param itemId 秒杀品ID
+     * @param version 客户端持有的缓存版本号
+     * @return 秒杀品缓存
+     */
     public FlashItemCache getCachedItem(Long itemId, Long version) {
+        // 1. 从本地缓存中查找
         FlashItemCache flashItemCache = flashItemLocalCache.getIfPresent(itemId);
         if (flashItemCache != null) {
+            // 本地缓存中存在 ，如果version==null 直接return
             if (version == null) {
                 logger.info("itemCache|命中本地缓存|{}", itemId);
                 return flashItemCache;
             }
+            // 如果version不为空，判断本地缓存中的version是否和传入的version一致，如果一致直接return
             if (version.equals(flashItemCache.getVersion()) || version < flashItemCache.getVersion()) {
                 logger.info("itemCache|命中本地缓存|{}", itemId, version);
                 return flashItemCache;
             }
-            if (version > (flashItemCache.getVersion())) {
-                return getLatestDistributedCache(itemId);
-            }
+            // 如果传入的version大于本地缓存中的version，说明本地缓存中的数据已经过期，需要从redis中获取
+
         }
         return getLatestDistributedCache(itemId);
     }
